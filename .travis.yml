@@ -32,7 +32,7 @@ script:
   - go vet ./...                                                     # go vet is the official Go static analyzer
   - chmod +x ./test.sh && ./test.sh                                  # Run unit tests
   - go build                                                         # Build
-  - go test ./... -v                                                 # Run unit tests
+  - go test ./...                                                    # Run unit tests
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

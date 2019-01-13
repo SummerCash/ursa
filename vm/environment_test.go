@@ -96,4 +96,5 @@ func TestReadEnvironmentFromMemory(t *testing.T) {
 	}
 
 	t.Log(err) // Log nil error to force code coverage
+	t.Log(env) // Log success
 }
