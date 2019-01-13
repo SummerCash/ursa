@@ -49,5 +49,11 @@ func TestEnvironmentFromBytes(t *testing.T) {
 		t.Fatal(err) // Panic
 	}
 
+	_, err = EnvironmentFromBytes(append(env.Bytes(), byte(2))) // Marshal from byte value (SHOULD FAIL)
+
+	if err != nil { // Check for errors
+		t.Logf("found error in marshaling incorrect bytes: %s", err.Error()) // Log success
+	}
+
 	t.Log(env) // Log success
 }
