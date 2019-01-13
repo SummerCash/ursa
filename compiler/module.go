@@ -1,6 +1,6 @@
 package compiler
 
-import "github.com/SummerCash/ursa/compiler/wasm"
+import "github.com/go-interpreter/wagon/wasm"
 
 // Module - wasm module
 type Module struct {
