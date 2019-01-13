@@ -1,6 +1,6 @@
 package opcodes
 
-// Opcode -
+// Opcode - opcode
 type Opcode byte
 
 const (
