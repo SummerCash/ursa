@@ -15,6 +15,8 @@ type Environment struct {
 	ReturnOnGasLimitExceeded bool   // Panic on exceed specified gas limit
 }
 
+/* BEGIN EXPORTED METHODS */
+
 // NewEnvironment - initialize virtual machine config with given params
 func NewEnvironment(maxMemoryPages int, maxTableSize int, maxValueSlots int, maxCallStackDepth int, defaultMemoryPages int, defaultTableSize int, gasLimit uint64, disableFloatingPoint bool, returnOnGasLimitExceeded bool) *Environment {
 	return &Environment{ // Return initialized vm config
@@ -29,6 +31,10 @@ func NewEnvironment(maxMemoryPages int, maxTableSize int, maxValueSlots int, max
 		ReturnOnGasLimitExceeded: returnOnGasLimitExceeded,
 	}
 }
+
+/*
+	BEGIN FORMATTING METHODS
+*/
 
 // String - get string representation of given env
 func (environment *Environment) String() string {
@@ -56,3 +62,22 @@ func EnvironmentFromBytes(b []byte) (*Environment, error) {
 
 	return buffer, nil // No error occurred, return read environment
 }
+
+/*
+	END FORMATTING METHODS
+*/
+
+/*
+	BEGIN I/O METHODs
+*/
+
+// WriteToMemory - write config to memory
+func (environment *Environment) WriteToMemory() error {
+	return nil // No error occurred, return nil
+}
+
+/*
+	END I/O METHODS
+*/
+
+/* END EXPORTED METHODS */
