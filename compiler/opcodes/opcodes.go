@@ -103,35 +103,94 @@ const (
 	// I32GeU - int32 ge opcode
 	I32GeU
 
+	// I64Const - int64 const opcode
 	I64Const
+
+	// I64Add - int64 add opcode
 	I64Add
+
+	// I64Sub - int64 subtract opcode
 	I64Sub
+
+	// I64Mul - int64 multiplication opcode
 	I64Mul
+
+	// I64DivS - int64 division opcode
 	I64DivS
+
+	// I64DivU - int64 division opcode
 	I64DivU
+
+	// I64RemS - int64 remainder opcode
 	I64RemS
+
+	// I64RemU - int64 remainder opcode
 	I64RemU
+
+	// I64Rotl - int64 rotate left opcode
 	I64Rotl
+
+	// I64Rotr - int64 rotate right opcode
 	I64Rotr
+
+	// I64Clz - int64 leading 0s cnt opcode
 	I64Clz
+
+	// I64Ctz - int64 "find first and set" opcode
 	I64Ctz
+
+	// I64PopCnt - int64 return 1-set bits opcode
 	I64PopCnt
+
+	// I64EqZ - int64 equal zero opcode
 	I64EqZ
+
+	// I64And - int64 and opcode
 	I64And
+
+	// I64Or - int64 0r opcode
 	I64Or
+
+	// I64Xor - int64 xor gate opcode
 	I64Xor
+
+	// I64Shl - int64 shift opcode
 	I64Shl
+
+	// I64ShrS - int64 shift right secure opcode
 	I64ShrS
+
+	// I64ShrU - int64 shift right universal opcode
 	I64ShrU
+
+	// I64Eq - int64 equal int64 opcode
 	I64Eq
+
+	// I64Ne - int64 not equal opcode
 	I64Ne
+
+	// I64LtS - int64 lesser-than opcode
 	I64LtS
+
+	// I64LtU - int64 lesser-than opcode
 	I64LtU
+
+	// I64LeS - int64 le opcode
 	I64LeS
+
+	// I64LeU - int64 le opcode
 	I64LeU
+
+	// I64GtS - int64 gt opcode
 	I64GtS
+
+	// I64GtU - int64 gt opcode
 	I64GtU
+
+	// I64GeS - int64 ge opcode
 	I64GeS
+
+	// I64GeU - int64 ge opcode
 	I64GeU
 
 	F32Add
