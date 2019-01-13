@@ -24,6 +24,6 @@ func TestCreateDirIfDoesNotExist(t *testing.T) {
 	err = CreateDirIfDoesNotExit(".../test") // Test should fail
 
 	if err != nil { // Check for errors
-		t.Logf("expected error: %s", err.Error()) // Log success
+		t.Logf("expected error: %s", err) // Log success
 	}
 }
