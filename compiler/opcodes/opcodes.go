@@ -193,120 +193,300 @@ const (
 	// I64GeU - int64 ge opcode
 	I64GeU
 
+	// F32Add - pretty self-explanatory
 	F32Add
+
+	// F32Sub - pretty self-explanatory
 	F32Sub
+
+	// F32Mul - pretty self-explanatory
 	F32Mul
+
+	// F32Div - pretty self-explanatory
 	F32Div
+
+	// F32Sqrt - pretty self-explanatory
 	F32Sqrt
+
+	// F32Min - pretty self-explanatory
 	F32Min
+
+	// F32Max - pretty self-explanatory
 	F32Max
+
+	// F32Ceil - pretty self-explanatory
 	F32Ceil
+
+	// F32Floor - pretty self-explanatory
 	F32Floor
+
+	// F32Trunc - pretty self-explanatory
 	F32Trunc
+
+	// F32Nearest - pretty self-explanatory
 	F32Nearest
+
+	// F32Abs - pretty self-explanatory
 	F32Abs
+
+	// F32Neg - pretty self-explanatory
 	F32Neg
+
+	// F32CopySign - pretty self-explanatory
 	F32CopySign
+
+	// F32Eq - pretty self-explanatory
 	F32Eq
+
+	// F32Ne - pretty self-explanatory
 	F32Ne
+
+	// F32Lt - pretty self-explanatory
 	F32Lt
+
+	// F32Le - pretty self-explanatory
 	F32Le
+
+	// F32Gt - pretty self-explanatory
 	F32Gt
+
+	// F32Ge - pretty self-explanatory
 	F32Ge
 
+	// F64Add - pretty self-explanatory
 	F64Add
+
+	// F64Sub - pretty self-explanatory
 	F64Sub
+
+	// F64Mul - pretty self-explanatory
 	F64Mul
+
+	// F64Div - pretty self-explanatory
 	F64Div
+
+	// F64Sqrt - pretty self-explanatory
 	F64Sqrt
+
+	// F64Min - pretty self-explanatory
 	F64Min
+
+	// F64Max - pretty self-explanatory
 	F64Max
+
+	// F64Ceil - pretty self-explanatory
 	F64Ceil
+
+	// F64Floor - pretty self-explanatory
 	F64Floor
+
+	// F64Trunc - pretty self-explanatory
 	F64Trunc
+
+	// F64Nearest - pretty self-explanatory
 	F64Nearest
+
+	// F64Abs - pretty self-explanatory
 	F64Abs
+
+	// F64Neg - pretty self-explanatory
 	F64Neg
+
+	// F64CopySign - pretty self-explanatory
 	F64CopySign
+
+	// F64Eq - pretty self-explanatory
 	F64Eq
+
+	// F64Ne - pretty self-explanatory
 	F64Ne
+
+	// F64Lt - pretty self-explanatory
 	F64Lt
+
+	// F64Le - pretty self-explanatory
 	F64Le
+
+	// F64Gt - pretty self-explanatory
 	F64Gt
+
+	// F64Ge - pretty self-explanatory
 	F64Ge
 
+	// I32WrapI64 - pretty self-explanatory
 	I32WrapI64
+
+	// I32TruncUF32 - pretty self-explanatory
 	I32TruncUF32
+
+	// I32TruncUF64 - pretty self-explanatory
 	I32TruncUF64
+
+	// I32TruncSF32 - pretty self-explanatory
 	I32TruncSF32
+
+	// I32TruncSF64 - pretty self-explanatory
 	I32TruncSF64
+
+	// I64TruncUF32 - pretty self-explanatory
 	I64TruncUF32
+
+	// I64TruncUF64 - pretty self-explanatory
 	I64TruncUF64
+
+	// I64TruncSF32 - pretty self-explanatory
 	I64TruncSF32
+
+	// I64TruncSF64 - pretty self-explanatory
 	I64TruncSF64
+
+	// I64ExtendUI32 - pretty self-explanatory
 	I64ExtendUI32
+
+	// I64ExtendSI32 - pretty self-explanatory
 	I64ExtendSI32
 
+	// F32DemoteF64 - pretty self-explanatory
 	F32DemoteF64
+
+	// F64PromoteF32 - pretty self-explanatory
 	F64PromoteF32
+
+	// F32ConvertSI32 - pretty self-explanatory
 	F32ConvertSI32
+
+	// F32ConvertSI64 - pretty self-explanatory
 	F32ConvertSI64
+
+	// F32ConvertUI32 - pretty self-explanatory
 	F32ConvertUI32
+
+	// F32ConvertUI64 - pretty self-explanatory
 	F32ConvertUI64
+
+	// F64ConvertSI32 - pretty self-explanatory
 	F64ConvertSI32
+
+	// F64ConvertSI64 - pretty self-explanatory
 	F64ConvertSI64
+
+	// F64ConvertUI32 - pretty self-explanatory
 	F64ConvertUI32
+
+	// F64ConvertUI64 - pretty self-explanatory
 	F64ConvertUI64
 
+	// I32Load - pretty self-explanatory
 	I32Load
+
+	// I64Load - pretty self-explanatory
 	I64Load
 
+	// I32Store - pretty self-explanatory
 	I32Store
+
+	// I64Store - pretty self-explanatory
 	I64Store
 
+	// I32Load8S - pretty self-explanatory
 	I32Load8S
+
+	// I32Load16S - pretty self-explanatory
 	I32Load16S
+
+	// I64Load8S - pretty self-explanatory
 	I64Load8S
+
+	// I64Load16S - pretty self-explanatory
 	I64Load16S
+
+	// I64Load32S - pretty self-explanatory
 	I64Load32S
 
+	// I32Load8U - pretty self-explanatory
 	I32Load8U
+
+	// I32Load16U - pretty self-explanatory
 	I32Load16U
+
+	// I64Load8U - pretty self-explanatory
 	I64Load8U
+
+	// I64Load16U - pretty self-explanatory
 	I64Load16U
+
+	// I64Load32U - pretty self-explanatory
 	I64Load32U
 
+	// I32Store8 - pretty self-explanatory
 	I32Store8
+
+	// I32Store16 - pretty self-explanatory
 	I32Store16
+
+	// I64Store8 - pretty self-explanatory
 	I64Store8
+
+	// I64Store16 - pretty self-explanatory
 	I64Store16
+
+	// I64Store32 - pretty self-explanatory
 	I64Store32
 
+	// Jmp - pretty self-explanatory
 	Jmp
+
+	// JmpIf - pretty self-explanatory
 	JmpIf
+
+	// JmpEither - pretty self-explanatory
 	JmpEither
+
+	// JmpTable - pretty self-explanatory
 	JmpTable
+
+	// ReturnValue - pretty self-explanatory
 	ReturnValue
+
+	// ReturnVoid - pretty self-explanatory
 	ReturnVoid
 
+	// GetLocal - pretty self-explanatory
 	GetLocal
+
+	// SetLocal - pretty self-explanatory
 	SetLocal
 
+	// GetGlobal - pretty self-explanatory
 	GetGlobal
+
+	// SetGlobal - pretty self-explanatory
 	SetGlobal
 
+	// Call - pretty self-explanatory
 	Call
+
+	// CallIndirect - pretty self-explanatory
 	CallIndirect
+
+	// InvokeImport - pretty self-explanatory
 	InvokeImport
 
+	// CurrentMemory - pretty self-explanatory
 	CurrentMemory
+
+	// GrowMemory - pretty self-explanatory
 	GrowMemory
 
+	// Phi - pretty self-explanatory
 	Phi
 
+	// AddGas - pretty self-explanatory
 	AddGas
 
+	// FPDisabledError - pretty self-explanatory
 	FPDisabledError
 
+	// Unknown - pretty self-explanatory
 	Unknown
 )
