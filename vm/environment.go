@@ -1,6 +1,13 @@
 package vm
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"path/filepath"
+
+	"github.com/SummerCash/ursa/common"
+)
 
 // Environment - VM config, vars
 type Environment struct {
@@ -71,9 +78,46 @@ func EnvironmentFromBytes(b []byte) (*Environment, error) {
 	BEGIN I/O METHODs
 */
 
-// WriteToMemory - write config to memory
+// WriteToMemory - write env to memory
 func (environment *Environment) WriteToMemory() error {
+	json, err := json.MarshalIndent(*environment, "", "  ") // Marshal env
+
+	if err != nil { // Check for errors
+		return err // Return error
+	}
+
+	err = common.CreateDirIfDoesNotExit(fmt.Sprintf("%s/config", common.DataDir)) // Create dir if necessary
+
+	if err != nil { // Check for errors
+		return err // Return error
+	}
+
+	err = ioutil.WriteFile(filepath.FromSlash(fmt.Sprintf("%s/config/environment.json", common.DataDir)), json, 0644) // Write environment to JSON
+
+	if err != nil { // Check for errors
+		return err // Return error
+	}
+
 	return nil // No error occurred, return nil
+}
+
+// ReadEnvironmentFromMemory - read env from memory
+func ReadEnvironmentFromMemory() (*Environment, error) {
+	data, err := ioutil.ReadFile(filepath.FromSlash(fmt.Sprintf("%s/config/environment.json", common.DataDir))) // Read file
+
+	if err != nil { // Check for errors
+		return &Environment{}, err // Return error
+	}
+
+	buffer := &Environment{} // Initialize buffer
+
+	err = json.Unmarshal(data, buffer) // Read json into buffer
+
+	if err != nil { // Check for errors
+		return &Environment{}, err // Return error
+	}
+
+	return buffer, nil // No error occurred, return read config
 }
 
 /*
