@@ -13,3 +13,6 @@
 
 # VSCode
 .vscode/
+
+# Run-time/test files
+common/data/
