@@ -36,3 +36,23 @@ func (environment *Environment) String() string {
 
 	return string(marshaledVal) // Return string value
 }
+
+// Bytes - get byte array representation of given env
+func (environment *Environment) Bytes() []byte {
+	marshaledVal, _ := json.MarshalIndent(*environment, "", "  ") // Marshal to JSON
+
+	return marshaledVal // Return success
+}
+
+// EnvironmentFromBytes - marshal byte array into environment struct
+func EnvironmentFromBytes(b []byte) (*Environment, error) {
+	buffer := &Environment{} // Initialize buffer
+
+	err := json.Unmarshal(b, buffer) // Read json into buffer
+
+	if err != nil { // Check for errors
+		return &Environment{}, err // Return error
+	}
+
+	return buffer, nil // No error occurred, return read environment
+}
