@@ -12,3 +12,14 @@ func TestGetDefaultDataDir(t *testing.T) {
 
 	t.Log(dataDir) // Log success
 }
+
+// TestCreateDirIfDoesNotExit - test functionality of dir creation /not exist
+func TestCreateDirIfDoesNotExist(t *testing.T) {
+	err := CreateDirIfDoesNotExit(DataDir) // Create data dir if not exist
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	t.Log(err) // ¯\_(ツ)_/¯
+}

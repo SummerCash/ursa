@@ -13,9 +13,6 @@ var (
 	ConfigDir = filepath.FromSlash(fmt.Sprintf("%s/config", DataDir))
 )
 
-// GetDefaultDataDir - get default data directory
-func GetDefaultDataDir() string {
-	abs, _ := filepath.Abs(filepath.FromSlash("./data")) // Get absolute dir
+/* BEGIN EXPORTED METHODS */
 
-	return filepath.FromSlash(abs) // Match slashes
-}
+/* END EXPORTED METHODS */
