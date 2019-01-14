@@ -16,6 +16,9 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/go-interpreter/wagon/wasm"]
+  input-imports = [
+    "github.com/go-interpreter/wagon/wasm",
+    "github.com/go-interpreter/wagon/wasm/leb128",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
