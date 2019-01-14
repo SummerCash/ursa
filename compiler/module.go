@@ -38,7 +38,11 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 		return &Module{}, err // Return error
 	}
 
-	err = validate.VerifyModule(m) // Verify module integrity
+	err = validate.VerifyModule(m) // Verify module
+
+	if err != nil { // Check for errors
+		return &Module{}, err // Return error
+	}
 
 	if err != nil { // Check for errors
 		return &Module{}, err // Return error
@@ -46,7 +50,7 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 
 	functionNames := make(map[int]string) // Init names buffer
 
-	for _, sec := range m.Other { // Iterate through misc. sections
+	for _, sec := range m.Customs { // Iterate through customs
 		r := bytes.NewReader(sec.Bytes) // Get byte reader
 
 		for { // Iterate

@@ -13,19 +13,6 @@
   revision = "0077fe2c1bbd991b8da10d878985e78ca6ac25e9"
   version = "v0.3.0"
 
-[[projects]]
-  digest = "1:8897fc300dd866975cf93c61245aed170ca0cdc0533a78e01ba2c94e91912cfd"
-  name = "github.com/go-interpreter/wagon"
-  packages = [
-    "wasm",
-    "wasm/internal/readpos",
-    "wasm/leb128",
-    "wasm/operators",
-  ]
-  pruneopts = "UT"
-  revision = "0077fe2c1bbd991b8da10d878985e78ca6ac25e9"
-  version = "v0.3.0"
-
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
