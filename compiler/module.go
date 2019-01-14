@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 
+	"github.com/go-interpreter/wagon/validate"
 	"github.com/go-interpreter/wagon/wasm"
 	"github.com/go-interpreter/wagon/wasm/leb128"
 )
@@ -37,13 +38,11 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 		return &Module{}, err // Return error
 	}
 
-	/*
-		err = validate.VerifyModule(m) // Verify module integrity
+	err = validate.VerifyModule(m) // Verify module integrity
 
-		if err != nil { // Check for errors
-			return &Module{}, err // Return error
-		}
-	*/
+	if err != nil { // Check for errors
+		return &Module{}, err // Return error
+	}
 
 	functionNames := make(map[int]string) // Init names buffer
 

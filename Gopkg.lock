@@ -2,12 +2,14 @@
 
 
 [[projects]]
-  digest = "1:46cd820e3d8bacd26ec42efb22451cf5a9d0b4b79bba2a9a446268b39d9749ac"
+  digest = "1:2a5f5e34eb0f7dbe6afcb4ee65246a5e499e852d4ecf460163960dbb93030452"
   name = "github.com/go-interpreter/wagon"
   packages = [
+    "validate",
     "wasm",
     "wasm/internal/readpos",
     "wasm/leb128",
+    "wasm/operators",
   ]
   pruneopts = "UT"
   revision = "0077fe2c1bbd991b8da10d878985e78ca6ac25e9"
@@ -17,6 +19,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/go-interpreter/wagon/validate",
     "github.com/go-interpreter/wagon/wasm",
     "github.com/go-interpreter/wagon/wasm/leb128",
   ]
