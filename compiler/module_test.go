@@ -2,12 +2,19 @@ package compiler
 
 import (
 	"io/ioutil"
+	"path/filepath"
 	"testing"
 )
 
 // TestLoadModule - test functionality of module loader
 func TestLoadModule(t *testing.T) {
-	testSourceFile, err := ioutil.ReadFile("main.wasm.txt") // Read test WASM file
+	abs, err := filepath.Abs(filepath.FromSlash("../examples/unary.wasm.txt")) // Get absolute path to test WASM file
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	testSourceFile, err := ioutil.ReadFile(abs) // Read test WASM file
 
 	if err != nil { // Check for errors
 		t.Fatal(err) // Panic
