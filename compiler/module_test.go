@@ -7,7 +7,7 @@ import (
 
 // TestLoadModule - test functionality of module loader
 func TestLoadModule(t *testing.T) {
-	testSourceFile, err := ioutil.ReadFile("test.wasm") // Read test WASM file
+	testSourceFile, err := ioutil.ReadFile("main.wasm") // Read test WASM file
 
 	if err != nil { // Check for errors
 		t.Fatal(err) // Panic
