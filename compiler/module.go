@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"errors"
 
-	"github.com/go-interpreter/wagon/validate"
-	"github.com/go-interpreter/wagon/wasm"
-	"github.com/go-interpreter/wagon/wasm/leb128"
+	"github.com/SummerCash/wagon/validate"
+	"github.com/SummerCash/wagon/wasm"
+	"github.com/SummerCash/wagon/wasm/leb128"
 )
 
 // Module - wasm module

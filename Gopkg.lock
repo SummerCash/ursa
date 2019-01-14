@@ -2,10 +2,21 @@
 
 
 [[projects]]
-  digest = "1:2a5f5e34eb0f7dbe6afcb4ee65246a5e499e852d4ecf460163960dbb93030452"
-  name = "github.com/go-interpreter/wagon"
+  digest = "1:222ec6761dd42dbf74986933e4e409e55b58f3367f51b5f29d6500f2f15e3723"
+  name = "github.com/SummerCash/wagon"
   packages = [
     "validate",
+    "wasm",
+    "wasm/leb128",
+  ]
+  pruneopts = "UT"
+  revision = "0077fe2c1bbd991b8da10d878985e78ca6ac25e9"
+  version = "v0.3.0"
+
+[[projects]]
+  digest = "1:8897fc300dd866975cf93c61245aed170ca0cdc0533a78e01ba2c94e91912cfd"
+  name = "github.com/go-interpreter/wagon"
+  packages = [
     "wasm",
     "wasm/internal/readpos",
     "wasm/leb128",
@@ -19,9 +30,9 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/go-interpreter/wagon/validate",
-    "github.com/go-interpreter/wagon/wasm",
-    "github.com/go-interpreter/wagon/wasm/leb128",
+    "github.com/SummerCash/wagon/validate",
+    "github.com/SummerCash/wagon/wasm",
+    "github.com/SummerCash/wagon/wasm/leb128",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
