@@ -51,69 +51,71 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 	functionNames := make(map[int]string) // Init names buffer
 
 	for _, sec := range m.Customs { // Iterate through customs
-		r := bytes.NewReader(sec.Bytes) // Get byte reader
+		if sec.Name == "name" { // Check should be analyzed
+			r := bytes.NewReader(sec.RawSection.Bytes) // Get section bytes as byte reader
 
-		for { // Iterate
-			ty, err := leb128.ReadVarUint32(r) // Read
+			for { // Iterate
+				ty, err := leb128.ReadVarUint32(r) // Read
 
-			if err != nil || ty != 1 { // Check for errors
-				break // Break
-			}
+				if err != nil || ty != 1 { // Check for errors
+					break // Break
+				}
 
-			payloadLen, err := leb128.ReadVarUint32(r) // Get payload length
+				payloadLen, err := leb128.ReadVarUint32(r) // Get payload length
 
-			if err != nil { // Check for errors
-				return &Module{}, err // Return errors
-			}
+				if err != nil { // Check for errors
+					return &Module{}, err // Return errors
+				}
 
-			data := make([]byte, int(payloadLen)) // Init payload buffer
+				data := make([]byte, int(payloadLen)) // Init payload buffer
 
-			n, err := r.Read(data) // Read data into buffer
+				n, err := r.Read(data) // Read data into buffer
 
-			if err != nil { // Check for errors
-				return &Module{}, err // Return errors
-			}
+				if err != nil { // Check for errors
+					return &Module{}, err // Return errors
+				}
 
-			if n != len(data) { // Check for invalid length
-				return &Module{}, errors.New("len mismatch") // Return errors
-			}
-			{
-				r := bytes.NewReader(data) // Init reader
+				if n != len(data) { // Check for invalid length
+					return &Module{}, errors.New("len mismatch") // Return errors
+				}
+				{
+					r := bytes.NewReader(data) // Init reader
 
-				for { // Iterate
-					count, err := leb128.ReadVarUint32(r) // Read payload count
-
-					if err != nil { // Check for errors
-						break // Break
-					}
-
-					for i := 0; i < int(count); i++ { // Iterate through
-						index, err := leb128.ReadVarUint32(r) // Read index
+					for { // Iterate
+						count, err := leb128.ReadVarUint32(r) // Read payload count
 
 						if err != nil { // Check for errors
-							return &Module{}, err // Return errors
+							break // Break
 						}
 
-						nameLen, err := leb128.ReadVarUint32(r) // Read name length
+						for i := 0; i < int(count); i++ { // Iterate through
+							index, err := leb128.ReadVarUint32(r) // Read index
 
-						if err != nil { // Check for errors
-							return &Module{}, err // Return errors
+							if err != nil { // Check for errors
+								return &Module{}, err // Return errors
+							}
+
+							nameLen, err := leb128.ReadVarUint32(r) // Read name length
+
+							if err != nil { // Check for errors
+								return &Module{}, err // Return errors
+							}
+
+							name := make([]byte, int(nameLen)) // Init name buffer
+
+							n, err := r.Read(name) // Read into buffer
+
+							if err != nil { // Check for errors
+								return &Module{}, err // Return errors
+							}
+
+							if n != len(name) { // Check for length mismatch
+								return &Module{}, errors.New("len mismatch") // Return errors
+							}
+
+							functionNames[int(index)] = string(name) // Append function name
+							//fmt.Printf("%d -> %s\n", int(index), string(name))
 						}
-
-						name := make([]byte, int(nameLen)) // Init name buffer
-
-						n, err := r.Read(name) // Read into buffer
-
-						if err != nil { // Check for errors
-							return &Module{}, err // Return errors
-						}
-
-						if n != len(name) { // Check for length mismatch
-							return &Module{}, errors.New("len mismatch") // Return errors
-						}
-
-						functionNames[int(index)] = string(name) // Append function name
-						//fmt.Printf("%d -> %s\n", int(index), string(name))
 					}
 				}
 			}

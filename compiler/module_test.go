@@ -26,5 +26,5 @@ func TestLoadModule(t *testing.T) {
 		t.Fatal(err) // Panic
 	}
 
-	t.Log(module) // Log success
+	t.Log(module.FunctionNames[0]) // Log success
 }
