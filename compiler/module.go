@@ -193,7 +193,7 @@ func (module *Module) CompileForInterpreter(gp GasPolicy) (_retCode []Interprete
 
 	for i, f := range module.Base.FunctionIndexSpace { // Iterate thorugh function index space
 		//fmt.Printf("Compiling function %d (%+v) with %d locals\n", i, f.Sig, len(f.Body.Locals))
-		d, err := disasm.Disassemble(f.Body.Code) // Disassemble function code
+		d, err := disasm.NewDisassembly(f, module.Base) // Disassemble function
 
 		if err != nil { // Check for errors
 			panic(err) // Panic to catch
@@ -203,8 +203,8 @@ func (module *Module) CompileForInterpreter(gp GasPolicy) (_retCode []Interprete
 		compiler.CallIndexOffset = numFuncImports          // Set index offset
 		compiler.Compile(importTypeIDs)                    // Compile
 
-		if module.DisableFloatingPoint {
-			compiler.FilterFloatingPoint()
+		if module.DisableFloatingPoint { // Check should disable floats
+			compiler.FilterFloatingPoint() // Set filter floating
 		}
 
 		if gp != nil { // Check has gas policy
