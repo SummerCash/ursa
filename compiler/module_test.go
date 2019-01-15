@@ -8,7 +8,7 @@ import (
 
 // TestLoadModule - test functionality of module loader
 func TestLoadModule(t *testing.T) {
-	abs, err := filepath.Abs(filepath.FromSlash("../examples/unary.wat")) // Get absolute path to test WASM file
+	abs, err := filepath.Abs(filepath.FromSlash("../examples/call.wasm")) // Get absolute path to test WASM file
 
 	if err != nil { // Check for errors
 		t.Fatal(err) // Panic
