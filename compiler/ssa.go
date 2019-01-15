@@ -68,6 +68,76 @@ func NewSSAFunctionCompiler(m *wasm.Module, d *disasm.Disassembly) *SSAFunctionC
 	}
 }
 
+// NextValueID - get ID of next value
+func (c *SSAFunctionCompiler) NextValueID() TyValueID {
+	c.ValueID++ // Increment iterator
+
+	return c.ValueID // Return value ID
+}
+
+// PopStack - clear last elm from stack
+func (c *SSAFunctionCompiler) PopStack(n int) []TyValueID {
+	if len(c.Stack) < n { // Check underflow
+		panic("stack underflow") // Panic
+	}
+
+	ret := make([]TyValueID, n) // INit buffer
+	pos := len(c.Stack) - n     // Set position
+	copy(ret, c.Stack[pos:])    // Copy into position
+	c.Stack = c.Stack[:pos]     // Set stack to popped
+
+	return ret // Return valueID
+}
+
+// PushStack - push to stack
+func (c *SSAFunctionCompiler) PushStack(values ...TyValueID) {
+	for i, id := range values { // Iterate through values
+		if _, ok := c.UsedValueIDs[id]; ok { // Check ok
+			panic("pushing a value ID twice is not supported yet") // Panic
+		}
+
+		c.UsedValueIDs[id] = struct{}{}                                                 // Set value ID to empty buffer
+		c.StackValueSets[len(c.Stack)+i] = append(c.StackValueSets[len(c.Stack)+i], id) // Set value sets
+	}
+
+	c.Stack = append(c.Stack, values...) // Append value to stack
+}
+
+// FixupLocationRef - fix location ref
+func (c *SSAFunctionCompiler) FixupLocationRef(loc *Location, wasUnreachable bool) {
+	if loc.PreserveTop || loc.LoopPreserveTop { // Check preserve top
+		if wasUnreachable { // Check was unreachable
+			c.Code = append( // Append instruction
+				c.Code,
+				buildInstr(0, "jmp", []int64{int64(len(c.Code) + 1)}, []TyValueID{0}),
+			)
+		} else {
+			c.Code = append( // Append instruction
+				c.Code,
+				buildInstr(0, "jmp", []int64{int64(len(c.Code) + 1)}, c.PopStack(1)),
+			)
+		}
+	}
+
+	var innerBrTarget int64 // Init br target buffer
+
+	if loc.BrHead { // Check has brHead
+		innerBrTarget = int64(loc.CodePos) // Write to br target buffer
+	} else {
+		innerBrTarget = int64(len(c.Code)) // Write to br target buffer
+	}
+
+	for _, info := range loc.FixupList { // Iterate through fixup list
+		c.Code[info.CodePos].Immediates[info.TablePos] = innerBrTarget // Set code
+	}
+
+	if loc.PreserveTop || loc.LoopPreserveTop /* why? */ {
+		retID := c.NextValueID()                                    // Get next value ID
+		c.Code = append(c.Code, buildInstr(retID, "phi", nil, nil)) // Push to code stack
+		c.PushStack(retID)                                          // Push to stack
+	}
+}
+
 // FilterFloatingPoint - handle disableFloatingPoint param
 func (c *SSAFunctionCompiler) FilterFloatingPoint() {
 	for i, ins := range c.Code { // Iterate through provided instructions

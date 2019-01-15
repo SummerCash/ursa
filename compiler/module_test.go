@@ -79,4 +79,6 @@ func TestCompileForInterpreter(t *testing.T) {
 	if err != nil { // Check for errors
 		t.Fatal(err) // Panic
 	}
+
+	t.Log(interpreterCompiled) // Log success
 }

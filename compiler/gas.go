@@ -4,7 +4,7 @@ package compiler
 func (c *SSAFunctionCompiler) InsertGasCounters(gp GasPolicy) {
 	cfg := c.NewCFGraph() // Init cf graph
 
-	for i, block := range cfg.Blocks { // Iterate through blocks
+	for _, block := range cfg.Blocks { // Iterate through blocks
 		blk := &block // Get current block pointer
 
 		totalCost := int64(0) // Init gas buffer
