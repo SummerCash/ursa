@@ -12,7 +12,7 @@ import (
 	"io"
 	"math"
 
-	"github.com/SummerCash/wagon/internal/stack"
+	"github.com/SummerCash/wagon/intrnl/stack"
 	"github.com/SummerCash/wagon/wasm"
 	"github.com/SummerCash/wagon/wasm/leb128"
 	ops "github.com/SummerCash/wagon/wasm/operators"

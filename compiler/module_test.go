@@ -51,3 +51,32 @@ func TestString(t *testing.T) {
 
 	t.Log(module.String()) // Log success
 }
+
+// TestCompileForInterpreter - test interpreter bytecode compile
+func TestCompileForInterpreter(t *testing.T) {
+	abs, err := filepath.Abs(filepath.FromSlash("../examples/main.wasm")) // Get absolute path to test WASM file
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	testSourceFile, err := ioutil.ReadFile(abs) // Read test WASM file
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	module, err := LoadModule(testSourceFile) // Load module
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	simpleGasPolicy := SimpleGasPolicy{GasPerInstruction: 1} // Init simple gas policy
+
+	interpreterCompiled, err := module.CompileForInterpreter(&simpleGasPolicy) // Compile for interpreter
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+}
