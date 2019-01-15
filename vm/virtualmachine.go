@@ -2,6 +2,9 @@ package vm
 
 import "github.com/SummerCash/ursa/compiler"
 
+// FunctionImport represents the function import type. If len(sig.ReturnTypes) == 0, the return value will be ignored.
+type FunctionImport func(vm *VirtualMachine) int64
+
 // VirtualMachine - container holding VM config, metadata
 type VirtualMachine struct {
 	Environment Environment `json:"environment"` // VM config
