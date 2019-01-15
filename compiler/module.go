@@ -2,9 +2,13 @@ package compiler
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 
+	"github.com/SummerCash/ursa/common"
+	"github.com/SummerCash/ursa/compiler/opcodes"
+	"github.com/SummerCash/wagon/disasm"
 	"github.com/SummerCash/wagon/validate"
 	"github.com/SummerCash/wagon/wasm"
 	"github.com/SummerCash/wagon/wasm/leb128"
@@ -135,4 +139,95 @@ func (module *Module) String() string {
 	marshaledVal, _ := json.MarshalIndent(*module, "", "  ") // Marshal to JSON
 
 	return string(marshaledVal) // Return string value
+}
+
+// CompileForInterpreter - compile given WASM bytecode for interpreter
+func (m *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode, retErr error) {
+	defer common.CatchPanic(&retErr) // Catch panic
+
+	ret := make([]InterpreterCode, 0) // Init interpreter code buffer
+	importTypeIDs := make([]int, 0)   // Init imports buffer
+
+	if m.Base.Import != nil { // Check has imports
+		for i := 0; i < len(m.Base.Import.Entries); i++ { // Iterate through imports
+			e := &m.Base.Import.Entries[i] // Get import entry
+
+			if e.Type.Kind() != wasm.ExternalFunction { // Check is extern
+				continue // Continue to next import
+			}
+
+			tyID := e.Type.(wasm.FuncImport).Type  // Get import type
+			ty := &m.Base.Types.Entries[int(tyID)] // Get import entry ty
+
+			buf := &bytes.Buffer{} // Init buffer
+
+			binary.Write(buf, binary.LittleEndian, uint32(1))            // value ID
+			binary.Write(buf, binary.LittleEndian, opcodes.InvokeImport) // Write invoked import
+			binary.Write(buf, binary.LittleEndian, uint32(i))            // Write to buffer
+
+			binary.Write(buf, binary.LittleEndian, uint32(0)) // Write to buffer
+
+			if len(ty.ReturnTypes) != 0 { // Check has return types
+				binary.Write(buf, binary.LittleEndian, opcodes.ReturnValue) // Write return value
+				binary.Write(buf, binary.LittleEndian, uint32(1))           // Write buffer
+			} else { // No return types
+				binary.Write(buf, binary.LittleEndian, opcodes.ReturnVoid) // Write is void
+			}
+
+			code := buf.Bytes() // Get final bytes
+
+			ret = append(ret, InterpreterCode{ // Append to interpreter code
+				NumRegs:    2,
+				NumParams:  len(ty.ParamTypes),
+				NumLocals:  0,
+				NumReturns: len(ty.ReturnTypes),
+				Bytes:      code,
+			})
+
+			importTypeIDs = append(importTypeIDs, int(tyID)) // Append to import types
+		}
+	}
+
+	numFuncImports := len(ret)                                                    // Get # of func imports
+	ret = append(ret, make([]InterpreterCode, len(m.Base.FunctionIndexSpace))...) // Append function index space to parsed interpreter source
+
+	for i, f := range m.Base.FunctionIndexSpace { // Iterate thorugh function index space
+		//fmt.Printf("Compiling function %d (%+v) with %d locals\n", i, f.Sig, len(f.Body.Locals))
+		d, err := disasm.Disassemble(f.Body.Code) // Disassemble function code
+
+		if err != nil { // Check for errors
+			panic(err) // Panic to catch
+		}
+
+		compiler := NewSSAFunctionCompiler(m.Base, d) // Init compiler
+		compiler.CallIndexOffset = numFuncImports     // Set index offset
+		compiler.Compile(importTypeIDs)               // Compile
+
+		if m.DisableFloatingPoint {
+			compiler.FilterFloatingPoint()
+		}
+
+		if gp != nil { // Check has gas policy
+			compiler.InsertGasCounters(gp) // Set gas policy/counter
+		}
+		//fmt.Println(compiler.Code)
+		//fmt.Printf("%+v\n", compiler.NewCFGraph())
+		numRegs := compiler.RegAlloc() // Alloc reg
+		//fmt.Println(compiler.Code)
+		numLocals := 0 // Init local vrs buffer
+
+		for _, v := range f.Body.Locals { // Iterate through locals
+			numLocals += int(v.Count) // Increment counter
+		}
+
+		ret[numFuncImports+i] = InterpreterCode{ // Set interpreter code
+			NumRegs:    numRegs,
+			NumParams:  len(f.Sig.ParamTypes),
+			NumLocals:  numLocals,
+			NumReturns: len(f.Sig.ReturnTypes),
+			Bytes:      compiler.Serialize(),
+		}
+	}
+
+	return ret, nil // Return read/compiled interpreter code
 }
