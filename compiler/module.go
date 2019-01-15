@@ -37,13 +37,13 @@ type InterpreterCode struct {
 func LoadModule(moduleBytes []byte) (*Module, error) {
 	reader := bytes.NewReader(moduleBytes) // Generate reader for inputted raw WASM module
 
-	m, err := wasm.ReadModule(reader, nil) // Read module via wagon
+	module, err := wasm.ReadModule(reader, nil) // Read module via wagon
 
 	if err != nil { // Check for errors
 		return &Module{}, err // Return error
 	}
 
-	err = validate.VerifyModule(m) // Verify module
+	err = validate.VerifyModule(module) // Verify module
 
 	if err != nil { // Check for errors
 		return &Module{}, err // Return error
@@ -55,7 +55,7 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 
 	functionNames := make(map[int]string) // Init names buffer
 
-	for _, sec := range m.Customs { // Iterate through customs
+	for _, sec := range module.Customs { // Iterate through customs
 		if sec.Name == "name" { // Check should be analyzed
 			r := bytes.NewReader(sec.RawSection.Bytes) // Get section bytes as byte reader
 
@@ -129,7 +129,7 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 	}
 
 	return &Module{ // Return initialized module
-		Base:          m,             // Set base
+		Base:          module,        // Set base module
 		FunctionNames: functionNames, // Set function names
 	}, nil
 }
@@ -142,22 +142,22 @@ func (module *Module) String() string {
 }
 
 // CompileForInterpreter - compile given WASM bytecode for interpreter
-func (m *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode, retErr error) {
+func (module *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode, retErr error) {
 	defer common.CatchPanic(&retErr) // Catch panic
 
 	ret := make([]InterpreterCode, 0) // Init interpreter code buffer
 	importTypeIDs := make([]int, 0)   // Init imports buffer
 
-	if m.Base.Import != nil { // Check has imports
-		for i := 0; i < len(m.Base.Import.Entries); i++ { // Iterate through imports
-			e := &m.Base.Import.Entries[i] // Get import entry
+	if module.Base.Import != nil { // Check has imports
+		for i := 0; i < len(module.Base.Import.Entries); i++ { // Iterate through imports
+			e := &module.Base.Import.Entries[i] // Get import entry
 
 			if e.Type.Kind() != wasm.ExternalFunction { // Check is extern
 				continue // Continue to next import
 			}
 
-			tyID := e.Type.(wasm.FuncImport).Type  // Get import type
-			ty := &m.Base.Types.Entries[int(tyID)] // Get import entry ty
+			tyID := e.Type.(wasm.FuncImport).Type       // Get import type
+			ty := &module.Base.Types.Entries[int(tyID)] // Get import entry ty
 
 			buf := &bytes.Buffer{} // Init buffer
 
@@ -188,10 +188,10 @@ func (m *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode
 		}
 	}
 
-	numFuncImports := len(ret)                                                    // Get # of func imports
-	ret = append(ret, make([]InterpreterCode, len(m.Base.FunctionIndexSpace))...) // Append function index space to parsed interpreter source
+	numFuncImports := len(ret)                                                         // Get # of func imports
+	ret = append(ret, make([]InterpreterCode, len(module.Base.FunctionIndexSpace))...) // Append function index space to parsed interpreter source
 
-	for i, f := range m.Base.FunctionIndexSpace { // Iterate thorugh function index space
+	for i, f := range module.Base.FunctionIndexSpace { // Iterate thorugh function index space
 		//fmt.Printf("Compiling function %d (%+v) with %d locals\n", i, f.Sig, len(f.Body.Locals))
 		d, err := disasm.Disassemble(f.Body.Code) // Disassemble function code
 
@@ -199,11 +199,11 @@ func (m *Module) CompileForInterpreter(gp GasPolicy) (_retCode []InterpreterCode
 			panic(err) // Panic to catch
 		}
 
-		compiler := NewSSAFunctionCompiler(m.Base, d) // Init compiler
-		compiler.CallIndexOffset = numFuncImports     // Set index offset
-		compiler.Compile(importTypeIDs)               // Compile
+		compiler := NewSSAFunctionCompiler(module.Base, d) // Init compiler
+		compiler.CallIndexOffset = numFuncImports          // Set index offset
+		compiler.Compile(importTypeIDs)                    // Compile
 
-		if m.DisableFloatingPoint {
+		if module.DisableFloatingPoint {
 			compiler.FilterFloatingPoint()
 		}
 
