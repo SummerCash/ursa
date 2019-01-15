@@ -8,7 +8,7 @@ import (
 
 // TestLoadModule - test functionality of module loader
 func TestLoadModule(t *testing.T) {
-	abs, err := filepath.Abs(filepath.FromSlash("../examples/call.wasm")) // Get absolute path to test WASM file
+	abs, err := filepath.Abs(filepath.FromSlash("../examples/main.wasm")) // Get absolute path to test WASM file
 
 	if err != nil { // Check for errors
 		t.Fatal(err) // Panic
@@ -26,5 +26,28 @@ func TestLoadModule(t *testing.T) {
 		t.Fatal(err) // Panic
 	}
 
-	t.Log(module.FunctionNames[0]) // Log success
+	t.Log(module) // Log success
+}
+
+// TestString - test custom module stringer
+func TestString(t *testing.T) {
+	abs, err := filepath.Abs(filepath.FromSlash("../examples/main.wasm")) // Get absolute path to test WASM file
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	testSourceFile, err := ioutil.ReadFile(abs) // Read test WASM file
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	module, err := LoadModule(testSourceFile) // Load module
+
+	if err != nil { // Check for errors
+		t.Fatal(err) // Panic
+	}
+
+	t.Log(module.String()) // Log success
 }

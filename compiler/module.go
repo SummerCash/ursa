@@ -2,6 +2,7 @@ package compiler
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 
 	"github.com/SummerCash/wagon/validate"
@@ -11,7 +12,7 @@ import (
 
 // Module - wasm module
 type Module struct {
-	Base                 *wasm.Module   `json:"base"` // Base parsed module
+	Base                 *wasm.Module   `json:"-"` // Base parsed module
 	FunctionNames        map[int]string // Module functions
 	DisableFloatingPoint bool           // Config to disable float ops
 }
@@ -127,4 +128,11 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 		Base:          m,             // Set base
 		FunctionNames: functionNames, // Set function names
 	}, nil
+}
+
+// String - module stringer
+func (module *Module) String() string {
+	marshaledVal, _ := json.MarshalIndent(*module, "", "  ") // Marshal to JSON
+
+	return string(marshaledVal) // Return string value
 }
