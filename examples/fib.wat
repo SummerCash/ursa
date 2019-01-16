@@ -3,7 +3,7 @@
         i32.const 35
         call 1
     )
-    (func (param i32) (result i32)
+    (func $fib (param i32) (result i32)
         i32.const 1
         i32.const 1
         get_local 0
@@ -29,4 +29,5 @@
 
         i32.add
     )
+    (export "fib" (func $fib))
 )
