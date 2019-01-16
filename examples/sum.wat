@@ -1,5 +1,5 @@
 (module
-    (func (result i64) (local i64) (local i64) (local i64)
+    (func $sum (result i64) (local i64) (local i64) (local i64)
         i64.const 0
         set_local 0
         i64.const 20000000
@@ -24,4 +24,5 @@
         get_local 2
         return
     )
+    (export "sum" (func $sum))
 )

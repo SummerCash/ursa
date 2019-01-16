@@ -64,8 +64,8 @@ func main() {
 	var args []int64 // Init arg buffer
 
 	if len(flag.Args()) != 0 { // Check has non-flag args
-		for _, arg := range flag.Args()[1:] { // Iterate through args
-			fmt.Println(arg)                              // Log arg
+		for _, arg := range flag.Args() { // Iterate through args
+			//fmt.Println(arg)                              // Log arg
 			if ia, err := strconv.Atoi(arg); err != nil { // Check for possible errors
 				panic(err) // Panic
 			} else {
