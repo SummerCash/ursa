@@ -17,10 +17,10 @@ type Resolver struct {
 }
 
 var (
-	sourceFlag        = flag.String("source", "", "specify .wasm source file to run")            // Init source flag
-	gasLimitFlag      = flag.Int("gas-limit", 0, "run .wasm with given gas limit")               // Init gas limit flag
-	gasPerInstruction = flag.Int64("gas-per", 1, "run .wasm with given gas policy")              // Init gas policy flag
-	entryFunctionFlag = flag.String("entry-function", "", "run .wasm from given entry function") // Init entry flag
+	sourceFlag        = flag.String("source", "", "specify .wasm source file to run")   // Init source flag
+	gasLimitFlag      = flag.Int("gas-limit", 0, "run .wasm with given gas limit")      // Init gas limit flag
+	gasPerInstruction = flag.Int64("gas-per", 1, "run .wasm with given gas policy")     // Init gas policy flag
+	entryFunctionFlag = flag.String("entry", "", "run .wasm from given entry function") // Init entry flag
 )
 
 func main() {
@@ -63,12 +63,14 @@ func main() {
 
 	var args []int64 // Init arg buffer
 
-	for _, arg := range flag.Args()[1:] { // Iterate through args
-		fmt.Println(arg)                              // Log arg
-		if ia, err := strconv.Atoi(arg); err != nil { // Check for possible errors
-			panic(err) // Panic
-		} else {
-			args = append(args, int64(ia)) // Append arg to args buffer
+	if len(flag.Args()) != 0 { // Check has non-flag args
+		for _, arg := range flag.Args()[1:] { // Iterate through args
+			fmt.Println(arg)                              // Log arg
+			if ia, err := strconv.Atoi(arg); err != nil { // Check for possible errors
+				panic(err) // Panic
+			} else {
+				args = append(args, int64(ia)) // Append arg to args buffer
+			}
 		}
 	}
 
