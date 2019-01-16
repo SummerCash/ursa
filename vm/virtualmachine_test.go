@@ -113,7 +113,7 @@ func (r *testResolver) ResolveGlobal(module, field string) int64 {
 	switch module {
 	case "env":
 		switch field {
-		case "__life_magic":
+		case "__ursa_magic":
 			return 424
 		default:
 			panic(fmt.Errorf("unknown field: %s", field))
