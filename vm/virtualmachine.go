@@ -206,3 +206,17 @@ func NewVirtualMachine(code []byte, config Environment, impResolver ImportResolv
 		Exited:          true,
 	}, nil
 }
+
+// GetCurrentFrame - returns the current frame
+func (vm *VirtualMachine) GetCurrentFrame() *Frame {
+	if vm.Environment.MaxCallStackDepth != 0 && vm.CurrentFrame >= vm.Environment.MaxCallStackDepth { // Check for stack limit exceeded
+		panic("max call stack depth exceeded") // Panic
+	}
+
+	if vm.CurrentFrame >= len(vm.CallStack) { // Check for stack overflow ( ͡° ͜ʖ ͡°)
+		panic("call stack overflow")
+		//vm.CallStack = append(vm.CallStack, make([]Frame, DefaultCallStackSize / 2)...)
+	}
+
+	return &vm.CallStack[vm.CurrentFrame] // Return frame
+}
