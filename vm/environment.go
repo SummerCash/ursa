@@ -11,18 +11,20 @@ import (
 
 // Environment - VM config, vars
 type Environment struct {
-	MaxMemoryPages    int // Max memory pages at given time
-	MaxTableSize      int // Max mem table size at given time
-	MaxValueSlots     int // Max value slots at given time
-	MaxCallStackDepth int // Max call stack length/depth at given time
+	EnableJIT bool `json:"JIT"` // Should enable JIT
 
-	DefaultMemoryPages int // Default num mem pages at given time
-	DefaultTableSize   int // Preset table size
+	MaxMemoryPages    int `json:"maxMemPages"`       // Max memory pages at given time
+	MaxTableSize      int `json:"maxTableSize"`      // Max mem table size at given time
+	MaxValueSlots     int `json:"maxValueSlots"`     // Max value slots at given time
+	MaxCallStackDepth int `json:"maxCallStackDepth"` // Max call stack length/depth at given time
 
-	GasLimit uint64 // Gas limit
+	DefaultMemoryPages int `json:"defaultMemPages"`  // Default num mem pages at given time
+	DefaultTableSize   int `json:"defaultTableSize"` // Preset table size
 
-	DisableFloatingPoint     bool // Remove float capacity
-	ReturnOnGasLimitExceeded bool // Panic on exceed specified gas limit
+	GasLimit uint64 `json:"gasLimit"` // Gas limit
+
+	DisableFloatingPoint     bool `json:"disableFloat"`      // Remove float capacity
+	ReturnOnGasLimitExceeded bool `json:"returnOnGasExceed"` // Panic on exceed specified gas limit
 }
 
 /* BEGIN EXPORTED METHODS */
