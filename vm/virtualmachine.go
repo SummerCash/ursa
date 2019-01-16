@@ -347,10 +347,10 @@ func (vm *VirtualMachine) AddAndCheckGas(delta uint64) bool {
 	return true // Return success
 }
 
-// Execute starts the virtual machines main instruction processing loop.
-// This function may return at any point and is guaranteed to return
+// Execute - start the virtual machines main instruction processing loop.
+// May return at any point and is guaranteed to return
 // at least once every 10000 instructions. Caller is responsible for
-// detecting VM status in a loop.
+// detecting VM status in a loop
 func (vm *VirtualMachine) Execute() {
 	if vm.Exited == true { // Check already exited
 		panic("attempting to execute an exited vm") // Panic
@@ -1402,7 +1402,7 @@ func (vm *VirtualMachine) Execute() {
 			functionID := int(vm.Table[tableItemID])
 			code := vm.FunctionCode[functionID]
 
-			// TODO: We are only checking CC here; Do we want strict typeck?
+			// TODO: We are only checking CC here; Do we want strict type-check?
 			if code.NumParams != len(sig.ParamTypes) || code.NumReturns != len(sig.ReturnTypes) {
 				panic("type mismatch")
 			}
@@ -1452,10 +1452,10 @@ func (vm *VirtualMachine) Execute() {
 			}
 
 		case opcodes.FPDisabledError: // Handle FPDisabledError
-			panic("wasm: floating point disabled")
+			panic("wasm: floating point disabled") // Panic
 
 		default:
-			panic("unknown instruction")
+			panic("unknown instruction") // Panic
 		}
 	}
 }

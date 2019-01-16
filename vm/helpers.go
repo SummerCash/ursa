@@ -8,7 +8,7 @@ import (
 
 var _ ImportResolver = (*NopResolver)(nil)
 
-// NopResolver is a nil WebAssembly module import resolver.
+// NopResolver - nil WebAssembly module import resolver.
 type NopResolver struct{}
 
 // ResolveFunc - panic
