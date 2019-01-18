@@ -103,7 +103,7 @@ func TestLoadState(t *testing.T) {
 		t.Fatal(err) // Panic
 	}
 
-	t.Log(loadVM.ReturnValue) // Log result
+	t.Logf("saved state: %d", loadVM.ReturnValue) // Log result
 }
 
 // TestSyncToState - test functionality of state sync
