@@ -8,6 +8,7 @@ import (
 
 	"github.com/SummerCash/ursa/common"
 	"github.com/SummerCash/ursa/compiler/opcodes"
+	"github.com/SummerCash/ursa/crypto"
 	"github.com/SummerCash/wagon/disasm"
 	"github.com/SummerCash/wagon/validate"
 	"github.com/SummerCash/wagon/wasm"
@@ -19,6 +20,7 @@ type Module struct {
 	Base                 *wasm.Module   `json:"-"` // Base parsed module
 	FunctionNames        map[int]string // Module functions
 	DisableFloatingPoint bool           // Config to disable float ops
+	Identifier           []byte         `json:"ID"` // Unique module identifier
 }
 
 // InterpreterCode - interpreter metadata
@@ -129,8 +131,9 @@ func LoadModule(moduleBytes []byte) (*Module, error) {
 	}
 
 	return &Module{ // Return initialized module
-		Base:          module,        // Set base module
-		FunctionNames: functionNames, // Set function names
+		Base:          module,                   // Set base module
+		FunctionNames: functionNames,            // Set function names
+		Identifier:    crypto.Sha3(moduleBytes), // Gen, set identifier
 	}, nil
 }
 
