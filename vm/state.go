@@ -58,7 +58,19 @@ func (vm *VirtualMachine) GetState() *StateEntry {
 
 // SyncToState - sync VM mem to last saved state TODO: allow syncing to different states by hash
 func (vm *VirtualMachine) SyncToState() {
-
+	(*vm).CallStack = vm.LastStateEntry.CallStack               // Set call stack
+	(*vm).CurrentFrame = vm.LastStateEntry.CurrentFrame         // Set current frame
+	(*vm).Table = vm.LastStateEntry.Table                       // Set table
+	(*vm).Globals = vm.LastStateEntry.Globals                   // set globals
+	(*vm).Memory = vm.LastStateEntry.Memory                     // Set mem
+	(*vm).NumValueSlots = vm.LastStateEntry.NumValueSlots       // Set # value slots
+	(*vm).Yielded = vm.LastStateEntry.Yielded                   // Set yielded
+	(*vm).InsideExecute = vm.LastStateEntry.InsideExecute       // Set inside execute
+	(*vm).Exited = vm.LastStateEntry.Exited                     // Set exited
+	(*vm).ExitError = vm.LastStateEntry.ExitError               // Set exitError
+	(*vm).ReturnValue = vm.LastStateEntry.ReturnValue           // Set returnValue
+	(*vm).Gas = vm.LastStateEntry.Gas                           // Set gas
+	(*vm).GasLimitExceeded = vm.LastStateEntry.GasLimitExceeded // Set gasLimitExceeded
 }
 
 // SaveState - save virtual machine state to persistent memory
