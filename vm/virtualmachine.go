@@ -6,10 +6,10 @@ import (
 	"math"
 	"math/bits"
 
+	"github.com/SummerCash/ursa/common"
 	"github.com/SummerCash/ursa/compiler"
 	"github.com/SummerCash/ursa/compiler/opcodes"
 	"github.com/SummerCash/wagon/wasm"
-	"github.com/perlin-network/life/utils"
 )
 
 const (
@@ -99,7 +99,7 @@ func NewVirtualMachine(code []byte, config Environment, impResolver ImportResolv
 		return nil, err // Return error
 	}
 
-	defer utils.CatchPanic(&retErr) // Catch panic
+	defer common.CatchPanic(&retErr) // Catch panic
 
 	table := make([]uint32, 0)               // Init buffer
 	globals := make([]int64, 0)              // Init buffer
