@@ -1,16 +1,10 @@
 package vm
 
 import (
-	"bytes"
-	"encoding/gob"
-	"encoding/hex"
+	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 
-	"github.com/SummerCash/ursa/common"
+	"github.com/SummerCash/ursa/crypto"
 )
 
 var (
@@ -18,146 +12,82 @@ var (
 	ErrNilStateEntry = errors.New("no state entries found")
 )
 
-// StateEntry - current VM state
+// StateEntry - VM state
 type StateEntry struct {
-	CallStack    []Frame // VM call stack
-	CurrentFrame int     // Current callstack frame
+	CallStack    []Frame `json:"call_stack"`    // VM call stack
+	CurrentFrame int     `json:"current_frame"` // Current callstack frame
 
-	Table []uint32 // VM mem/runtime table
+	Table []uint32 `json:"table"` // VM mem/runtime table
 
-	Globals []int64 // Global vrs
+	Globals []int64 `json:"globals"` // Global vrs
 
-	Memory []byte // Virtual machine memory
+	Memory []byte `json:"memory"` // Virtual machine memory
 
-	NumValueSlots int // Num of used value slots
+	NumValueSlots int `json:"num_val_slots"` // Num of used value slots
 
-	Yielded int64 // Did yield
+	Yielded int64 `json:"yielded"` // Did yield
 
-	InsideExecute bool // Inside execute
+	InsideExecute bool `json:"inside_execute"` // Inside execute
 
-	Exited    bool        // Did exit
-	ExitError interface{} // Error on exit
+	Exited    bool        `json:"has_exited"` // Did exit
+	ExitError interface{} `json:"exit_err"`   // Error on exit
 
-	ReturnValue int64 // Return value
+	ReturnValue int64 `json:"return"` // Return value
 
-	Gas              uint64 // Gas usage
-	GasLimitExceeded bool   // Has exceeded given gas limit
+	Gas              uint64 `json:"gas"`                // Gas usage
+	GasLimitExceeded bool   `json:"gas_limit_exceeded"` // Has exceeded given gas limit
+
+	Nonce uint64 `json:"nonce"` // Entry nonce
+
+	ID []byte `json:"ID"` // Entry ID
 }
 
-// GetState - syncs VM state
-func (vm *VirtualMachine) GetState() *StateEntry {
-	return &StateEntry{
-		CallStack:        vm.CallStack,        // Set call stack
-		CurrentFrame:     vm.CurrentFrame,     // Set current frame
-		Table:            vm.Table,            // Set table
-		Globals:          vm.Globals,          // Set globals
-		Memory:           vm.Memory,           // Set memory
-		NumValueSlots:    vm.NumValueSlots,    // Set value slots
-		Yielded:          vm.Yielded,          // Set yielded
-		InsideExecute:    vm.InsideExecute,    // Set inside execute
-		Exited:           vm.Exited,           // Set has exited
-		ExitError:        vm.ExitError,        // Set exit error
-		ReturnValue:      vm.ReturnValue,      // Set return value
-		Gas:              vm.Gas,              // Set gas
-		GasLimitExceeded: vm.GasLimitExceeded, // Set gas limit exceeded
-	} // Return state
+/* BEGIN EXPORTED METHODS */
+
+// NewStateEntry - initialize new state entry
+func NewStateEntry(callStack []Frame, currentFrame int, table []uint32, globals []int64, memory []byte, numValueSlots int, yielded int64, insideExecute bool, exited bool, exitError interface{}, returnValue int64, gas uint64, gasLimitExceeded bool, nonce uint64) *StateEntry {
+	entry := &StateEntry{
+		CallStack:        callStack,        // Set call stack
+		CurrentFrame:     currentFrame,     // Set current frame
+		Table:            table,            // Set table
+		Globals:          globals,          // Set globals
+		Memory:           memory,           // Set memory
+		NumValueSlots:    numValueSlots,    // Set value slots
+		Yielded:          yielded,          // Set yielded
+		InsideExecute:    insideExecute,    // Set inside execute
+		Exited:           exited,           // Set has exited
+		ExitError:        exitError,        // Set exit error
+		ReturnValue:      returnValue,      // Set return value
+		Gas:              gas,              // Set gas
+		GasLimitExceeded: gasLimitExceeded, // Set gas limit exceeded
+		Nonce:            nonce,            // Set nonce
+	} // Init state db entry
+
+	(*entry).ID = crypto.Sha3(entry.Bytes()) // Hash
+
+	return entry // Return success
 }
 
-// SyncToState - sync VM mem to last saved state TODO: allow syncing to different states by hash
-func (vm *VirtualMachine) SyncToState() error {
-	if vm.LastStateEntry == nil { // Check has state sync
-		return ErrNilStateEntry // Return error
-	}
+/*
+	BEGIN TYPE HELPERS
+*/
 
-	(*vm).CallStack = vm.LastStateEntry.CallStack               // Set call stack
-	(*vm).CurrentFrame = vm.LastStateEntry.CurrentFrame         // Set current frame
-	(*vm).Table = vm.LastStateEntry.Table                       // Set table
-	(*vm).Globals = vm.LastStateEntry.Globals                   // set globals
-	(*vm).Memory = vm.LastStateEntry.Memory                     // Set mem
-	(*vm).NumValueSlots = vm.LastStateEntry.NumValueSlots       // Set # value slots
-	(*vm).Yielded = vm.LastStateEntry.Yielded                   // Set yielded
-	(*vm).InsideExecute = vm.LastStateEntry.InsideExecute       // Set inside execute
-	(*vm).Exited = vm.LastStateEntry.Exited                     // Set exited
-	(*vm).ExitError = vm.LastStateEntry.ExitError               // Set exitError
-	(*vm).ReturnValue = vm.LastStateEntry.ReturnValue           // Set returnValue
-	(*vm).Gas = vm.LastStateEntry.Gas                           // Set gas
-	(*vm).GasLimitExceeded = vm.LastStateEntry.GasLimitExceeded // Set gasLimitExceeded
+// Bytes - get byte representation of entry
+func (entry *StateEntry) Bytes() []byte {
+	marshaledVal, _ := json.MarshalIndent(*entry, "", "  ") // Marshal JSON
 
-	return nil // No error occurred, return nil
+	return marshaledVal // Return success
 }
 
-// SaveState - save virtual machine state to persistent memory
-func (vm *VirtualMachine) SaveState() error {
-	err := vm.Environment.WriteToMemory() // Save config to persistent memory
+// String - get string representation of entry
+func (entry *StateEntry) String() string {
+	marshaledVal, _ := json.MarshalIndent(*entry, "", "  ") // Marshal JSON
 
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	var stateBuffer bytes.Buffer // Init encoding buffer
-
-	encoder := gob.NewEncoder(&stateBuffer) // Write to state buffer
-
-	err = encoder.Encode(*vm.GetState()) // Encode virtual machine state
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	abs, err := filepath.Abs(filepath.FromSlash(fmt.Sprintf("%s/state", common.DataDir))) // Get absolute dir
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	err = common.CreateDirIfDoesNotExit(abs) // Create data dir if not exist
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	err = ioutil.WriteFile(filepath.FromSlash(fmt.Sprintf("%s/%s.ursa", abs, hex.EncodeToString(vm.Module.Identifier))), stateBuffer.Bytes(), 0644) // Write state buffer to persistent memory
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	return nil // No error occurred, return nil
+	return string(marshaledVal) // Return success
 }
 
-// LoadState - read the virtual machine state from persistent memory (if applicable)
-func (vm *VirtualMachine) LoadState() error {
-	abs, err := filepath.Abs(filepath.FromSlash(fmt.Sprintf("%s/state", common.DataDir))) // Get absolute dir
+/*
+	END TYPE HELPERS
+*/
 
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	stateBuffer := &StateEntry{} // Init state buffer
-
-	stateFile, err := os.Open(filepath.FromSlash(fmt.Sprintf("%s/%s.ursa", abs, hex.EncodeToString(vm.Module.Identifier)))) // Read state bytes
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	decoder := gob.NewDecoder(stateFile) // Init gob decoder
-
-	err = decoder.Decode(stateBuffer) // Decode state bytes
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	stateFile.Close() // Close state file
-
-	(*vm).LastStateEntry = stateBuffer // Set last state entry
-
-	err = vm.SyncToState() // Sync to state
-
-	if err != nil { // Check for errors
-		return err // Return found error
-	}
-
-	return nil // No error occurred, return nil
-}
+/* END EXPORTED METHODS */
