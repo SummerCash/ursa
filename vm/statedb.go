@@ -2,9 +2,15 @@ package vm
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/SummerCash/ursa/common"
 	"github.com/SummerCash/ursa/crypto"
+)
+
+var (
+	// ErrStateAlreadyExists - describes an error regarding a state addition in a state database already containing the given state
+	ErrStateAlreadyExists = errors.New("state already exists in given state DB")
 )
 
 // StateDatabase - database holding vm states
@@ -31,6 +37,19 @@ func NewStateDatabase(rootState *StateEntry) *StateDatabase {
 	(*stateDB).ID = crypto.Sha3(stateDB.Bytes()) // Set db id
 
 	return stateDB // Return init db
+}
+
+// AddState - add state to given state database
+func (stateDB *StateDatabase) AddState(state *StateEntry) error {
+	_, err := stateDB.QueryState(state.ID) // Check state already in DB
+
+	if err == nil { // Check for already existent state
+		return ErrStateAlreadyExists // Return error
+	}
+
+	(*stateDB).States = append((*stateDB).States, state) // Append state
+
+	return nil // No error occurred, return nil
 }
 
 // QueryState - query state in db by identifier
