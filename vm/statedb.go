@@ -3,6 +3,7 @@ package vm
 import (
 	"encoding/json"
 
+	"github.com/SummerCash/ursa/common"
 	"github.com/SummerCash/ursa/crypto"
 )
 
@@ -39,7 +40,7 @@ func (stateDB *StateDatabase) QueryState(id []byte) (*StateEntry, error) {
 	}
 
 	for _, state := range stateDB.States { // Iterate through states
-		if state.ID == id { // Check for match
+		if common.ByteIsEqual(state.ID, id) { // Check for match
 			return state, nil // Return found state
 		}
 	}
