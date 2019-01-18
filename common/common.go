@@ -19,6 +19,21 @@ var (
 	BEGIN UTIL METHODS
 */
 
+// ByteIsEqual - == for []byte
+func ByteIsEqual(a []byte, b []byte) bool {
+	if len(a) != len(b) { // Check match
+		return false // No match
+	}
+
+	for i, v := range a { // Iterate through bytes
+		if v != b[i] { // Check for match
+			return false // Return false
+		}
+	}
+
+	return true // Return true
+}
+
 // CatchPanic catches any panic and writes the error to out.
 func CatchPanic(out *error) {
 	if err := recover(); err != nil { // Attempt to recover from panic
