@@ -3,12 +3,19 @@ package vm
 import (
 	"bytes"
 	"encoding/gob"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"github.com/SummerCash/ursa/common"
+)
+
+var (
+	// ErrNilStateEntry - describes an error regarding a stateDB of 0 entry length
+	ErrNilStateEntry = errors.New("no state entries found")
 )
 
 // StateEntry - current VM state
@@ -57,7 +64,11 @@ func (vm *VirtualMachine) GetState() *StateEntry {
 }
 
 // SyncToState - sync VM mem to last saved state TODO: allow syncing to different states by hash
-func (vm *VirtualMachine) SyncToState() {
+func (vm *VirtualMachine) SyncToState() error {
+	if vm.LastStateEntry == nil { // Check has state sync
+		return ErrNilStateEntry // Return error
+	}
+
 	(*vm).CallStack = vm.LastStateEntry.CallStack               // Set call stack
 	(*vm).CurrentFrame = vm.LastStateEntry.CurrentFrame         // Set current frame
 	(*vm).Table = vm.LastStateEntry.Table                       // Set table
@@ -71,6 +82,8 @@ func (vm *VirtualMachine) SyncToState() {
 	(*vm).ReturnValue = vm.LastStateEntry.ReturnValue           // Set returnValue
 	(*vm).Gas = vm.LastStateEntry.Gas                           // Set gas
 	(*vm).GasLimitExceeded = vm.LastStateEntry.GasLimitExceeded // Set gasLimitExceeded
+
+	return nil // No error occurred, return nil
 }
 
 // SaveState - save virtual machine state to persistent memory
@@ -91,7 +104,7 @@ func (vm *VirtualMachine) SaveState() error {
 		return err // Return found error
 	}
 
-	abs, err := filepath.Abs(filepath.FromSlash(fmt.Sprintf("%s/state_%s.ursa", common.DataDir, vm.Module.Identifier))) // Get absolute dir
+	abs, err := filepath.Abs(filepath.FromSlash(fmt.Sprintf("%s/state", common.DataDir))) // Get absolute dir
 
 	if err != nil { // Check for errors
 		return err // Return found error
@@ -103,7 +116,7 @@ func (vm *VirtualMachine) SaveState() error {
 		return err // Return found error
 	}
 
-	err = ioutil.WriteFile(abs, stateBuffer.Bytes(), 0644) // Write state buffer to persistent memory
+	err = ioutil.WriteFile(filepath.FromSlash(fmt.Sprintf("%s/%s.ursa", abs, hex.EncodeToString(vm.Module.Identifier))), stateBuffer.Bytes(), 0644) // Write state buffer to persistent memory
 
 	if err != nil { // Check for errors
 		return err // Return found error
@@ -114,7 +127,7 @@ func (vm *VirtualMachine) SaveState() error {
 
 // LoadState - read the virtual machine state from persistent memory (if applicable)
 func (vm *VirtualMachine) LoadState() error {
-	abs, err := filepath.Abs(filepath.FromSlash(fmt.Sprintf("%s/state_%s.ursa", common.DataDir, vm.Module.Identifier))) // Get absolute dir
+	abs, err := filepath.Abs(filepath.FromSlash(fmt.Sprintf("%s/state", common.DataDir))) // Get absolute dir
 
 	if err != nil { // Check for errors
 		return err // Return found error
@@ -122,7 +135,7 @@ func (vm *VirtualMachine) LoadState() error {
 
 	stateBuffer := &StateEntry{} // Init state buffer
 
-	stateFile, err := os.Open(abs) // Read state bytes
+	stateFile, err := os.Open(filepath.FromSlash(fmt.Sprintf("%s/%s.ursa", abs, hex.EncodeToString(vm.Module.Identifier)))) // Read state bytes
 
 	if err != nil { // Check for errors
 		return err // Return found error
@@ -139,6 +152,12 @@ func (vm *VirtualMachine) LoadState() error {
 	stateFile.Close() // Close state file
 
 	(*vm).LastStateEntry = stateBuffer // Set last state entry
+
+	err = vm.SyncToState() // Sync to state
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
 
 	return nil // No error occurred, return nil
 }
