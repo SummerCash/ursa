@@ -57,7 +57,7 @@ type VirtualMachine struct {
 	Gas              uint64 // Gas usage
 	GasLimitExceeded bool   // Has exceeded given gas limit
 
-	LastStateEntry *StateEntry // Last state entry
+	StateDB *StateDatabase // State database
 }
 
 // Frame - call stack frame
