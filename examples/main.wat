@@ -3,4 +3,9 @@
   (func $main (type $t0) (result i32)
     i32.const 42
     return)
-  (export "main" (func $main)))
+  (func $main2 (type $t0) (result i32)
+    i32.const 128
+    return)
+  (export "main" (func $main))
+  (export "main2" (func $main2))
+)
