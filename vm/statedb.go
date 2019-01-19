@@ -65,6 +65,12 @@ func (stateDB *StateDatabase) AddStateEntry(state *StateEntry, rootState *StateE
 
 	(*stateDB).WorkingRoot = state // Set working root
 
+	err = stateDB.WriteToMemory() // Write db to memory
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
 	return nil // No error occurred, return nil
 }
 
