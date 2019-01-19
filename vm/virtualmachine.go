@@ -245,6 +245,37 @@ func (vm *VirtualMachine) SaveState() error {
 	return nil // No error occurred, return nil
 }
 
+// ResetToState - revert vm state to given state with ID
+func (vm *VirtualMachine) ResetToState(id []byte) error {
+	err := vm.LoadStateDB(hex.EncodeToString(vm.StateDB.ID)) // Load state db
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	state, err := vm.StateDB.QueryState(id) // Query state
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	(*vm).CallStack = state.State.CallStack               // Set call stack
+	(*vm).CurrentFrame = state.State.CurrentFrame         // Set current frame
+	(*vm).Table = state.State.Table                       // Set table
+	(*vm).Globals = state.State.Globals                   // Set globals
+	(*vm).Memory = state.State.Memory                     // Set memory
+	(*vm).NumValueSlots = state.State.NumValueSlots       // Set # value slots
+	(*vm).Yielded = state.State.Yielded                   // Set yielded
+	(*vm).InsideExecute = state.State.InsideExecute       // Set inside execute
+	(*vm).Exited = state.State.Exited                     // Set has exited
+	(*vm).ExitError = state.State.ExitError               // Set exit error
+	(*vm).ReturnValue = state.State.ReturnValue           // Set return val
+	(*vm).Gas = state.State.Gas                           // Set gas
+	(*vm).GasLimitExceeded = state.State.GasLimitExceeded // Set has exceeded gas limit
+
+	return nil // No error occurred, return nil
+}
+
 // LoadWorkingRoot - load last saved state
 func (vm *VirtualMachine) LoadWorkingRoot() error {
 	err := vm.LoadStateDB(hex.EncodeToString(vm.StateDB.ID)) // Load state db
