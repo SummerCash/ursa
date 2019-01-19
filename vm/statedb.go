@@ -11,6 +11,9 @@ import (
 var (
 	// ErrStateAlreadyExists - describes an error regarding a state addition in a state database already containing the given state
 	ErrStateAlreadyExists = errors.New("state already exists in given state DB")
+
+	// ErrInvalidStateNonce - describes an error regarding a state addition with a nonce less than the last provided in the given state db
+	ErrInvalidStateNonce = errors.New("invalid state nonce")
 )
 
 // StateDatabase - database holding vm states
@@ -45,6 +48,10 @@ func (stateDB *StateDatabase) AddState(state *StateEntry) error {
 
 	if err == nil { // Check for already existent state
 		return ErrStateAlreadyExists // Return error
+	}
+
+	if state.Nonce <= stateDB.States[len(stateDB.States)-1].Nonce { // Check invalid nonce
+		return ErrInvalidStateNonce // Return error
 	}
 
 	(*stateDB).States = append((*stateDB).States, state) // Append state
