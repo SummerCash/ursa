@@ -21,6 +21,8 @@ type StateDatabase struct {
 	States    []*StateEntry `json:"states"` // All states (not in tree)
 	StateRoot *StateEntry   `json:"root"`   // VM state root
 
+	WorkingRoot *StateEntry `json:"working_root"` // Working VM state root
+
 	MerkleRoot []byte `json:"merkle_root"` // State merkle root
 
 	ID []byte `json:"ID"` // State DB ID
@@ -37,6 +39,7 @@ func NewStateDatabase(rootState *StateEntry) *StateDatabase {
 	}
 
 	(*stateDB).ID = crypto.Sha3(stateDB.Bytes()) // Set db id
+	(*stateDB).WorkingRoot = rootState           // Set working root
 
 	return stateDB // Return init db
 }
@@ -55,6 +58,8 @@ func (stateDB *StateDatabase) AddStateEntry(state *StateEntry, rootState *StateE
 
 	(*(*rootState).State).StateChildren = append((*(*rootState).State).StateChildren, state) // Append state
 	(*stateDB).States = append((*stateDB).States, state)                                     // Append to general states
+
+	(*stateDB).WorkingRoot = state // Set working root
 
 	return nil // No error occurred, return nil
 }
