@@ -74,6 +74,30 @@ func (stateDB *StateDatabase) QueryState(id []byte) (*StateEntry, error) {
 	return &StateEntry{}, ErrNilStateEntry // Return error
 }
 
+// FindMax - find state entry with max nonce value
+func (stateDB *StateDatabase) FindMax() (*StateEntry, error) {
+	if stateDB.States == nil || len(stateDB.States) == 0 || stateDB.StateRoot == nil { // Check for nil state db
+		return &StateEntry{}, ErrNilStateEntry // Return error
+	}
+
+	lastEntry := stateDB.StateRoot // Set last
+	currentEntry := &StateEntry{}  // Init buffer
+
+	var err error // Init error buffer
+
+	for lastEntry.Nonce > currentEntry.Nonce { // Iterate until found max
+		lastEntry = currentEntry // Set last entry
+
+		currentEntry, err = lastEntry.FindMax() // Find max
+
+		if err != nil { // Check for errors
+			return &StateEntry{}, err // Return found error
+		}
+	}
+
+	return currentEntry, nil // Return found state entry
+}
+
 /*
 	BEGIN TYPE HELPERS
 */
