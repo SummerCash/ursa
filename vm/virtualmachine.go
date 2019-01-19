@@ -2,6 +2,7 @@ package vm
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"math/bits"
@@ -199,7 +200,7 @@ func NewVirtualMachine(code []byte, config Environment, impResolver ImportResolv
 		}
 	}
 
-	return &VirtualMachine{ // Return initialized vm
+	vm := &VirtualMachine{
 		Module:          m,
 		Environment:     config,
 		FunctionCode:    functionCode,
@@ -210,7 +211,76 @@ func NewVirtualMachine(code []byte, config Environment, impResolver ImportResolv
 		Globals:         globals,
 		Memory:          memory,
 		Exited:          true,
-	}, nil
+	} // Init VM
+
+	rootState := NewStateEntry(vm.CallStack, vm.CurrentFrame, vm.Table, vm.Globals, vm.Memory, vm.NumValueSlots, vm.Yielded, vm.InsideExecute, vm.Exited, vm.ExitError, vm.ReturnValue, vm.Gas, vm.GasLimitExceeded, 0) // Init state entry
+
+	stateDB := NewStateDatabase(rootState) // Init state database
+
+	(*vm).StateDB = stateDB // Set state DB
+
+	return vm, nil // Return init vm
+}
+
+// SaveState - save state
+func (vm *VirtualMachine) SaveState() error {
+	workingRoot := vm.StateDB.WorkingRoot // Get working root
+
+	nonce := workingRoot.Nonce + 1 // Init nonce buffer
+
+	maxChild, err := workingRoot.FindMax() // Find max
+
+	if err == nil { // Check no errors
+		nonce = maxChild.Nonce + 1 // Set nonce
+	}
+
+	state := NewStateEntry(vm.CallStack, vm.CurrentFrame, vm.Table, vm.Globals, vm.Memory, vm.NumValueSlots, vm.Yielded, vm.InsideExecute, vm.Exited, vm.ExitError, vm.ReturnValue, vm.Gas, vm.GasLimitExceeded, nonce) // Init state entry
+
+	err = vm.StateDB.AddStateEntry(state, workingRoot) // Add state entry
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	return nil // No error occurred, return nil
+}
+
+// LoadWorkingRoot - load last saved state
+func (vm *VirtualMachine) LoadWorkingRoot() error {
+	err := vm.LoadStateDB(hex.EncodeToString(vm.StateDB.ID)) // Load state db
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	(*vm).CallStack = vm.StateDB.WorkingRoot.State.CallStack               // Set call stack
+	(*vm).CurrentFrame = vm.StateDB.WorkingRoot.State.CurrentFrame         // Set current frame
+	(*vm).Table = vm.StateDB.WorkingRoot.State.Table                       // Set table
+	(*vm).Globals = vm.StateDB.WorkingRoot.State.Globals                   // Set globals
+	(*vm).Memory = vm.StateDB.WorkingRoot.State.Memory                     // Set memory
+	(*vm).NumValueSlots = vm.StateDB.WorkingRoot.State.NumValueSlots       // Set # value slots
+	(*vm).Yielded = vm.StateDB.WorkingRoot.State.Yielded                   // Set yielded
+	(*vm).InsideExecute = vm.StateDB.WorkingRoot.State.InsideExecute       // Set inside execute
+	(*vm).Exited = vm.StateDB.WorkingRoot.State.Exited                     // Set has exited
+	(*vm).ExitError = vm.StateDB.WorkingRoot.State.ExitError               // Set exit error
+	(*vm).ReturnValue = vm.StateDB.WorkingRoot.State.ReturnValue           // Set return val
+	(*vm).Gas = vm.StateDB.WorkingRoot.State.Gas                           // Set gas
+	(*vm).GasLimitExceeded = vm.StateDB.WorkingRoot.State.GasLimitExceeded // Set has exceeded gas limit
+
+	return nil // No error occurred, return nil
+}
+
+// LoadStateDB - load state database
+func (vm *VirtualMachine) LoadStateDB(id string) error {
+	stateDB, err := ReadStateDBFromMemory(id) // Read state db
+
+	if err != nil { // Check for errors
+		return err // Return found error
+	}
+
+	(*vm).StateDB = stateDB // Set state db
+
+	return nil // No error occurred, return nil
 }
 
 // Init - initializes a frame; must be called on `call` and `call_indirect`
