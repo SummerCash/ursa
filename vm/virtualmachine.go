@@ -259,6 +259,8 @@ func (vm *VirtualMachine) ResetToState(id []byte) error {
 		return err // Return found error
 	}
 
+	vm.StateDB.SetWorkingRoot(state) // Set working root
+
 	(*vm).CallStack = state.State.CallStack               // Set call stack
 	(*vm).CurrentFrame = state.State.CurrentFrame         // Set current frame
 	(*vm).Table = state.State.Table                       // Set table
