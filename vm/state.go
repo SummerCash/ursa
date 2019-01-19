@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/SummerCash/ursa/common"
 	"github.com/SummerCash/ursa/crypto"
 )
 
@@ -83,6 +84,29 @@ func NewStateEntry(callStack []Frame, currentFrame int, table []uint32, globals 
 	return entry // Return success
 }
 
+// FindMax - find state child of greatest nonce value
+func (stateEntry *StateEntry) FindMax() (*StateEntry, error) {
+	if len(stateEntry.State.StateChildren) == 0 || stateEntry.State.StateChildren == nil { // Check for errors
+		return &StateEntry{}, ErrNilStateEntry // Return error
+	}
+
+	nilState := &StateEntry{Nonce: 0} // Init nil state
+
+	lastState := &StateEntry{Nonce: 0} // Init state buffer
+
+	for _, stateChild := range stateEntry.State.StateChildren { // Iterate through children
+		if stateChild.Nonce > lastState.Nonce { // Check is max
+			lastState = stateChild // Set last state
+		}
+	}
+
+	if common.ByteIsEqual(lastState.Bytes(), nilState.Bytes()) { // Check no results
+		return &StateEntry{}, ErrNilStateEntry // Return error
+	}
+
+	return lastState, nil // Return found max
+}
+
 /*
 	BEGIN TYPE HELPERS
 */
@@ -102,15 +126,15 @@ func (state *State) String() string {
 }
 
 // Bytes - get byte representation of entry
-func (entry *StateEntry) Bytes() []byte {
-	marshaledVal, _ := json.MarshalIndent(*entry, "", "  ") // Marshal JSON
+func (stateEntry *StateEntry) Bytes() []byte {
+	marshaledVal, _ := json.MarshalIndent(*stateEntry, "", "  ") // Marshal JSON
 
 	return marshaledVal // Return success
 }
 
 // String - get string representation of entry
-func (entry *StateEntry) String() string {
-	marshaledVal, _ := json.MarshalIndent(*entry, "", "  ") // Marshal JSON
+func (stateEntry *StateEntry) String() string {
+	marshaledVal, _ := json.MarshalIndent(*stateEntry, "", "  ") // Marshal JSON
 
 	return string(marshaledVal) // Return success
 }
