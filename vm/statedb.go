@@ -46,6 +46,10 @@ func NewStateDatabase(rootState *StateEntry) *StateDatabase {
 
 // AddStateEntry - add state entry to given state database at given root state
 func (stateDB *StateDatabase) AddStateEntry(state *StateEntry, rootState *StateEntry) error {
+	if rootState == nil { // Check for nil state
+		rootState = stateDB.WorkingRoot // Set root state to working root
+	}
+
 	_, err := stateDB.QueryState(state.ID) // Check state already in DB
 
 	if err == nil { // Check for already existent state
@@ -62,6 +66,11 @@ func (stateDB *StateDatabase) AddStateEntry(state *StateEntry, rootState *StateE
 	(*stateDB).WorkingRoot = state // Set working root
 
 	return nil // No error occurred, return nil
+}
+
+// SetWorkingRoot - set current working root (similar to a "git checkout COMMIT_HASH")
+func (stateDB *StateDatabase) SetWorkingRoot(rootState *StateEntry) {
+	stateDB.WorkingRoot = rootState // Set working root
 }
 
 // QueryState - query state in db by identifier
