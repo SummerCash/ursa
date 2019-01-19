@@ -217,6 +217,12 @@ func NewVirtualMachine(code []byte, config Environment, impResolver ImportResolv
 
 	stateDB := NewStateDatabase(rootState) // Init state database
 
+	err = stateDB.WriteToMemory() // Write state db
+
+	if err != nil { // Check for errors
+		return nil, err // Return found error
+	}
+
 	(*vm).StateDB = stateDB // Set state DB
 
 	return vm, nil // Return init vm
