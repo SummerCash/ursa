@@ -12,8 +12,17 @@ var (
 	ErrNilStateEntry = errors.New("no state entries found")
 )
 
-// StateEntry - VM state
+// StateEntry - state entry header
 type StateEntry struct {
+	States []*State `json:"state"` // State
+
+	Nonce uint64 `json:"nonce"` // Entry nonce
+
+	ID []byte `json:"ID"` // Entry ID
+}
+
+// State - state node
+type State struct {
 	CallStack    []Frame `json:"call_stack"`    // VM call stack
 	CurrentFrame int     `json:"current_frame"` // Current callstack frame
 
@@ -37,16 +46,16 @@ type StateEntry struct {
 	Gas              uint64 `json:"gas"`                // Gas usage
 	GasLimitExceeded bool   `json:"gas_limit_exceeded"` // Has exceeded given gas limit
 
-	Nonce uint64 `json:"nonce"` // Entry nonce
+	StateChildren []*StateEntry `json:"children"` // State children
 
-	ID []byte `json:"ID"` // Entry ID
+	ID []byte `json:"ID"` // State ID
 }
 
 /* BEGIN EXPORTED METHODS */
 
 // NewStateEntry - initialize new state entry
 func NewStateEntry(callStack []Frame, currentFrame int, table []uint32, globals []int64, memory []byte, numValueSlots int, yielded int64, insideExecute bool, exited bool, exitError interface{}, returnValue int64, gas uint64, gasLimitExceeded bool, nonce uint64) *StateEntry {
-	entry := &StateEntry{
+	state := &State{
 		CallStack:        callStack,        // Set call stack
 		CurrentFrame:     currentFrame,     // Set current frame
 		Table:            table,            // Set table
@@ -60,7 +69,13 @@ func NewStateEntry(callStack []Frame, currentFrame int, table []uint32, globals 
 		ReturnValue:      returnValue,      // Set return value
 		Gas:              gas,              // Set gas
 		GasLimitExceeded: gasLimitExceeded, // Set gas limit exceeded
-		Nonce:            nonce,            // Set nonce
+	} // Init state
+
+	(*state).ID = crypto.Sha3(state.Bytes()) // Hash
+
+	entry := &StateEntry{
+		States: []*State{state}, // Set state
+		Nonce:  nonce,           // Set nonce
 	} // Init state db entry
 
 	(*entry).ID = crypto.Sha3(entry.Bytes()) // Hash
@@ -71,6 +86,20 @@ func NewStateEntry(callStack []Frame, currentFrame int, table []uint32, globals 
 /*
 	BEGIN TYPE HELPERS
 */
+
+// Bytes - get byte representation of state
+func (state *State) Bytes() []byte {
+	marshaledVal, _ := json.MarshalIndent(*state, "", "  ") // Marshal JSON
+
+	return marshaledVal // Return success
+}
+
+// String - get string representation of state
+func (state *State) String() string {
+	marshaledVal, _ := json.MarshalIndent(*state, "", "  ") // Marshal JSON
+
+	return string(marshaledVal) // Return success
+}
 
 // Bytes - get byte representation of entry
 func (entry *StateEntry) Bytes() []byte {
