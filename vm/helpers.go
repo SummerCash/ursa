@@ -2,6 +2,7 @@ package vm
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/perlin-network/life/utils"
 )
@@ -10,6 +11,11 @@ var _ ImportResolver = (*NopResolver)(nil)
 
 // NopResolver - nil WebAssembly module import resolver.
 type NopResolver struct{}
+
+// Resolver - define imports for WebAssembly modules
+type Resolver struct {
+	tempRet0 int64
+}
 
 // ResolveFunc - panic
 func (r *NopResolver) ResolveFunc(module, field string) FunctionImport {
@@ -70,4 +76,49 @@ func (vm *VirtualMachine) Run(entryID int, params ...int64) (int64, error) {
 	}
 
 	return vm.ReturnValue, nil // Return success
+}
+
+// ResolveFunc - define a set of import functions that may be called within a WebAssembly module
+func (r *Resolver) ResolveFunc(module, field string) FunctionImport {
+	fmt.Printf("Resolve func: %s %s\n", module, field) // Log resolve
+
+	switch module { // Handle module types
+	case "env": // Env module
+		switch field { // Handle fields
+		case "__life_ping":
+			return func(vm *VirtualMachine) int64 {
+				return vm.GetCurrentFrame().Locals[0] + 1
+			}
+		case "__life_log":
+			return func(vm *VirtualMachine) int64 {
+				ptr := int(uint32(vm.GetCurrentFrame().Locals[0]))
+				msgLen := int(uint32(vm.GetCurrentFrame().Locals[1]))
+				msg := vm.Memory[ptr : ptr+msgLen]
+				fmt.Printf("[app] %s\n", string(msg))
+				return 0
+			}
+
+		default:
+			panic(fmt.Errorf("unknown field: %s", field)) // Panic
+		}
+	default:
+		panic(fmt.Errorf("unknown module: %s", module)) // Panic
+	}
+}
+
+// ResolveGlobal - define a set of global variables for use within a WebAssembly module
+func (r *Resolver) ResolveGlobal(module, field string) int64 {
+	fmt.Printf("Resolve global: %s %s\n", module, field) // Log resolve global
+
+	switch module { // Handle module types
+	case "env": // Env module
+		switch field { // Handle fields
+		case "__ursa_magic":
+			return 424 // Return magic
+		default:
+			panic(fmt.Errorf("unknown field: %s", field)) // Panic
+		}
+	default:
+		panic(fmt.Errorf("unknown module: %s", module)) // Panic
+	}
 }
