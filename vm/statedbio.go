@@ -12,6 +12,29 @@ import (
 	"github.com/SummerCash/ursa/common"
 )
 
+// StateDatabaseFromBytes - marshal given byte array into state database
+func StateDatabaseFromBytes(b []byte) (*StateDatabase, error) {
+	var stateBytes bytes.Buffer // Init state bytes buffer
+
+	_, err := stateBytes.Write(b) // Write to buffer
+
+	if err != nil { // Check for errors
+		return &StateDatabase{}, err // Return found error
+	}
+
+	stateBuffer := &StateDatabase{} // Init state buffer
+
+	decoder := gob.NewDecoder(&stateBytes) // Init gob decoder
+
+	err = decoder.Decode(stateBuffer) // Decode state bytes
+
+	if err != nil { // Check for errors
+		return &StateDatabase{}, err // Return found error
+	}
+
+	return stateBuffer, nil // Return read state
+}
+
 // WriteToMemory - write state database to persistent storage with given data path
 func (stateDB *StateDatabase) WriteToMemory() error {
 	var stateBuffer bytes.Buffer // Init encoding buffer
