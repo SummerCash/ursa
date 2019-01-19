@@ -14,7 +14,7 @@ var (
 
 // StateEntry - state entry header
 type StateEntry struct {
-	States []*State `json:"state"` // State
+	State *State `json:"state"` // State
 
 	Nonce uint64 `json:"nonce"` // Entry nonce
 
@@ -74,8 +74,8 @@ func NewStateEntry(callStack []Frame, currentFrame int, table []uint32, globals 
 	(*state).ID = crypto.Sha3(state.Bytes()) // Hash
 
 	entry := &StateEntry{
-		States: []*State{state}, // Set state
-		Nonce:  nonce,           // Set nonce
+		State: state, // Set state
+		Nonce: nonce, // Set nonce
 	} // Init state db entry
 
 	(*entry).ID = crypto.Sha3(entry.Bytes()) // Hash

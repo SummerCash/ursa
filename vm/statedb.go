@@ -18,9 +18,8 @@ var (
 
 // StateDatabase - database holding vm states
 type StateDatabase struct {
-	States []*StateEntry `json:"states"` // VM states
-
-	StateRoot *StateEntry `json:"root"` // VM state root
+	States    []*StateEntry `json:"states"` // All states (not in tree)
+	StateRoot *StateEntry   `json:"root"`   // VM state root
 
 	MerkleRoot []byte `json:"merkle_root"` // State merkle root
 
@@ -42,19 +41,20 @@ func NewStateDatabase(rootState *StateEntry) *StateDatabase {
 	return stateDB // Return init db
 }
 
-// AddState - add state to given state database
-func (stateDB *StateDatabase) AddState(state *StateEntry) error {
+// AddStateEntry - add state entry to given state database at given root state
+func (stateDB *StateDatabase) AddStateEntry(state *StateEntry, rootState *StateEntry) error {
 	_, err := stateDB.QueryState(state.ID) // Check state already in DB
 
 	if err == nil { // Check for already existent state
 		return ErrStateAlreadyExists // Return error
 	}
 
-	if state.Nonce <= stateDB.States[len(stateDB.States)-1].Nonce { // Check invalid nonce
+	if state.Nonce <= rootState.Nonce { // Check invalid nonce
 		return ErrInvalidStateNonce // Return error
 	}
 
-	(*stateDB).States = append((*stateDB).States, state) // Append state
+	(*(*rootState).State).StateChildren = append((*(*rootState).State).StateChildren, state) // Append state
+	(*stateDB).States = append((*stateDB).States, state)                                     // Append to general states
 
 	return nil // No error occurred, return nil
 }
