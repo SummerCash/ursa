@@ -2,6 +2,8 @@
 
 A stack-based Go WebAssembly virtual machine.
 
+[![Build Status](https://travis-ci.com/SummerCash/ursa.svg?branch=master)](https://travis-ci.com/SummerCash/ursa)
+
 ## Installation
 
 ```BASH
