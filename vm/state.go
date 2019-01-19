@@ -86,7 +86,7 @@ func NewStateEntry(callStack []Frame, currentFrame int, table []uint32, globals 
 
 // FindMax - find state child of greatest nonce value
 func (stateEntry *StateEntry) FindMax() (*StateEntry, error) {
-	if len(stateEntry.State.StateChildren) == 0 || stateEntry.State.StateChildren == nil { // Check for errors
+	if stateEntry.State == nil || stateEntry.State.StateChildren == nil || len(stateEntry.State.StateChildren) == 0 { // Check for errors
 		return &StateEntry{}, ErrNilStateEntry // Return error
 	}
 

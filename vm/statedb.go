@@ -85,8 +85,10 @@ func (stateDB *StateDatabase) FindMax() (*StateEntry, error) {
 
 	var err error // Init error buffer
 
-	for lastEntry.Nonce > currentEntry.Nonce { // Iterate until found max
-		lastEntry = currentEntry // Set last entry
+	for lastEntry.Nonce >= currentEntry.Nonce { // Iterate until found max
+		if currentEntry.State != nil { // Check is not nil state
+			lastEntry = currentEntry // Set last entry
+		}
 
 		currentEntry, err = lastEntry.FindMax() // Find max
 
