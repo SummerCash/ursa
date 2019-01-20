@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/perlin-network/life/utils"
+	"github.com/SummerCash/ursa/common"
 )
 
 var _ ImportResolver = (*NopResolver)(nil)
@@ -50,7 +50,7 @@ func (vm *VirtualMachine) RunWithGasLimit(entryID, limit int, params ...int64) (
 	}
 
 	if vm.ExitError != nil { // Check for errors
-		return -1, utils.UnifyError(vm.ExitError) // Return error
+		return -1, common.UnifyError(vm.ExitError) // Return error
 	}
 
 	return vm.ReturnValue, nil // Return success
@@ -72,7 +72,7 @@ func (vm *VirtualMachine) Run(entryID int, params ...int64) (int64, error) {
 	}
 
 	if vm.ExitError != nil { // Check for exit error
-		return -1, utils.UnifyError(vm.ExitError) // Panic/return err
+		return -1, common.UnifyError(vm.ExitError) // Panic/return err
 	}
 
 	return vm.ReturnValue, nil // Return success
