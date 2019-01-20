@@ -18,7 +18,7 @@ type Resolver struct {
 
 var (
 	sourceFlag        = flag.String("source", "", "specify .wasm source file to run")   // Init source flag
-	gasLimitFlag      = flag.Int("gas-limit", 0, "run .wasm with given gas limit")      // Init gas limit flag
+	gasLimitFlag      = flag.Int("gas-limit", 1000, "run .wasm with given gas limit")   // Init gas limit flag
 	gasPerInstruction = flag.Int64("gas-per", 1, "run .wasm with given gas policy")     // Init gas policy flag
 	entryFunctionFlag = flag.String("entry", "", "run .wasm from given entry function") // Init entry flag
 )
@@ -74,7 +74,7 @@ func main() {
 		}
 	}
 
-	ret, err := vm.Run(entryID, args...) // Run with given entry function, params
+	ret, err := vm.RunWithGasLimit(entryID, *gasLimitFlag, args...) // Run with given entry function, params, gas
 
 	if err != nil { // Check for errors
 		vm.PrintStackTrace() // Log stack trace
@@ -82,6 +82,7 @@ func main() {
 	}
 
 	fmt.Printf("%d\n", ret) // Log successful run
+	fmt.Println(vm.Gas)
 }
 
 // ResolveFunc - define a set of import functions that may be called within a WebAssembly module
