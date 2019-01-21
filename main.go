@@ -81,13 +81,12 @@ func main() {
 		panic(err)           // Panic
 	}
 
-	fmt.Printf("%d\n", ret) // Log successful run
-	fmt.Println(vm.Gas)
+	fmt.Printf("Return Value: %d, Gas Used: %d\n", ret, vm.Gas) // Log successful run
 }
 
 // ResolveFunc - define a set of import functions that may be called within a WebAssembly module
 func (r *Resolver) ResolveFunc(module, field string) vm.FunctionImport {
-	fmt.Printf("Resolve func: %s %s\n", module, field) // Log resolve
+	//fmt.Printf("Resolve func: %s %s\n", module, field) // Log resolve
 
 	switch module { // Handle module types
 	case "env": // Env module
