@@ -21,7 +21,7 @@ go run main.go --source PATH-TO-.WASM --entry ENTRY-FUNCTION-NAME
 An example:
 
 ```BASH
-go run main.go --source examples/unary.wasm --entry i32_clz
+go run main.go --source examples/unary.wasm --gas-per 0 --entry i32_clz
 ```
 
 A rust -> wasm example:
