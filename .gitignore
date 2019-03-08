@@ -18,3 +18,6 @@
 common/data/
 vm/data/
 data/
+
+# Vendor
+vendor/
